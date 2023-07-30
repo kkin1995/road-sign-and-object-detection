@@ -15,9 +15,11 @@ def extract_data_id(path: str) -> str:
     Extracts the data id from a given path.
 
     Parameters:
+    ----
     path (str): The path from which to extract the data id.
 
     Returns:
+    ----
     str: The extracted data id.
     """
     return path.split("/")[-1].split(".")[0]
@@ -33,12 +35,14 @@ def find_corresponding_image_or_label(
     Finds the corresponding image or label for a given data id.
 
     Parameters:
+    ----
     data_id (str): The data id for which to find the corresponding image or label.
     find_image_or_label (str): Specifies whether to find an image or a label. Should be either "image" or "label".
     image_paths (list): A list of image paths.
     label_paths (list): A list of label paths.
 
     Returns:
+    ----
     list: A list of image or label ids that correspond to the given data id.
     """
     if find_image_or_label not in [IMAGE, LABEL]:
@@ -56,11 +60,13 @@ def convert_bbox_to_opencv_format(
     Converts bounding box coordinates to OpenCV format.
 
     Parameters:
+    ----
     label (DataFrame): A DataFrame containing class label and bounding box coordinates.
     image_width (int): The width of the image.
     image_height (int): The height of the image.
 
     Returns:
+    ----
     tuple: A tuple containing the top left and bottom right coordinates of the bounding box.
     """
     label.loc[:, "x_center"] = label.loc[:, "x_center"] * image_width
@@ -78,14 +84,17 @@ def convert_bbox_to_opencv_format(
     return c1, c2
 
 
-def compute_image_with_bbox(data_id: str) -> np.ndarray:
+def compute_image_with_bbox(data_id: str, classes: list) -> np.ndarray:
     """
     Computes an image with a bounding box.
 
     Parameters:
+    ----
     data_id (str): The data id for which to compute the image.
+    classes (list): List of classes
 
     Returns:
+    ----
     ndarray: An image with a bounding box.
     """
     image_path = find_corresponding_image_or_label(
@@ -110,6 +119,26 @@ def compute_image_with_bbox(data_id: str) -> np.ndarray:
         image, c1, c2, color=COLOR_BBOX, thickness=line_thickness
     )
 
+    font_thickness = max(line_thickness - 1, 1)
+
+    cv2.getTextSize(
+        classes[label.loc[0, "class"]],
+        0,
+        fontScale=line_thickness / 3,
+        thickness=font_thickness,
+    )[0]
+
+    image_with_bbox = cv2.putText(
+        image_with_bbox,
+        classes[label.loc[0, "class"]],
+        (c1[0], c1[1] - 2),
+        0,
+        line_thickness / 3,
+        [255, 0, 0],
+        thickness=font_thickness,
+        lineType=cv2.LINE_AA,
+    )
+
     return image_with_bbox
 
 
@@ -131,7 +160,7 @@ if __name__ == "__main__":
 
     data_id = extract_data_id(label_paths[0])
 
-    image_with_bbox = compute_image_with_bbox(data_id)
+    image_with_bbox = compute_image_with_bbox(data_id, classes)
 
     plt.imshow(image_with_bbox)
     plt.show()
