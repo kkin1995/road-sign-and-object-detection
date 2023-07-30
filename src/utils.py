@@ -105,6 +105,8 @@ def compute_image_with_bbox(data_id: str, classes: list) -> np.ndarray:
     )[0]
 
     image = cv2.imread(image_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
     height, width, _ = image.shape
     label = pd.read_csv(label_path, sep=" ", header=None)
     label.columns = ["class", "x_center", "y_center", "w", "h"]
