@@ -184,5 +184,15 @@ poetry.toml
 pyrightconfig.json
 
 data/
+*.txt
+src/darknet53.conv.74
+*.data
+*.cfg
+*.weights
+*.names
+literature/
+*.names
+yolov5/
+src/darknet/
 
 # End of https://www.toptal.com/developers/gitignore/api/opencv,python
