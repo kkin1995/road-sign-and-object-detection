@@ -9,20 +9,23 @@ def extract_data_id(path):
 
 
 load_dotenv()
-IMAGE_DATA = os.environ.get("IMAGE_DATA")
+DATA_DIR = os.environ.get("DATA_DIR")
 
-image_files = glob.glob(os.path.join(IMAGE_DATA, "*.jpg"))
+scale_percent = 60
+image_files = glob.glob(os.path.join(DATA_DIR, "*.jpg"))
 
-new_width = 832
-new_height = 480
-
-if not os.path.exists(os.path.join(IMAGE_DATA, "resized")):
-    os.makedirs(os.path.join(IMAGE_DATA, "resized"))
+if not os.path.exists(os.path.join(DATA_DIR, "resized")):
+    os.makedirs(os.path.join(DATA_DIR, "resized"))
 
 for image in image_files:
     img = cv2.imread(image)
-    resized_img = cv2.resize(img, (new_width, new_height))
+    (h, w, _) = img.shape
+    new_width = int(w * scale_percent / 100)
+    new_height = int(h * scale_percent / 100)
+    new_dim = (new_width, new_height)
+    resized_img = cv2.resize(img, new_dim)
     cv2.imwrite(
-        os.path.join(IMAGE_DATA, "resized", extract_data_id(image) + ".jpg"),
+        os.path.join(DATA_DIR, "resized", extract_data_id(image) + ".jpg"),
         resized_img,
     )
+print(new_dim)
